@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Door Panel Size Checker</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px; background: #f4f7fa; color: #1d2b3a;
+         font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
+  main { max-width: 480px; margin: auto; background: #fff; padding: 24px;
+         border: 1px solid #ddd; border-radius: 12px; }
+  h1 { font-size: 1.5rem; margin: 0 0 8px; }
+  .fixed { background: #f3f4f6; padding: 15px; border-radius: 8px; }
+  .fixed p { margin: 4px 0; }
+  label { display: block; font-weight: 700; margin: 18px 0 6px; }
+  input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #a9bdd6; border-radius: 8px; }
+  button { margin-top: 20px; padding: 14px; width: 100%; background: #2563eb; color: #fff;
+           border: 0; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
+  #panel-result { margin-top: 16px; font-weight: bold; min-height: 1.5em; }
+</style>
+</head>
+<body>
+<main>
+  <h1>🪵 Panel Size Calculator</h1>
+  <p>Measure the opening of your frame, then calculate the panel size.</p>
+
+  <div class="fixed">
+    <p><strong>Fixed Measurements</strong></p>
+    <p>Groove depth: 1/2" on each side</p>
+    <p>Clearance allowance: 1/8"</p>
+    <p><strong>Formula:</strong><br>Panel Size = Opening + 1" − 1/8"</p>
+  </div>
+
+  <label for="opening">1. Opening size (inches)</label>
+  <input id="opening" type="text" placeholder="e.g. 10 3/4" autocomplete="off" spellcheck="false">
+
+  <label for="student-answer">2. Your calculated panel size (inches)</label>
+  <input id="student-answer" type="text" placeholder="e.g. 11 5/8" autocomplete="off" spellcheck="false">
+
+  <button type="button" id="check">Check My Answer</button>
+
+  <div id="panel-result" aria-live="polite"></div>
+</main>
+
+<script>
+function parseInches(value) {
+  const text = value.trim().replace(/["″“”]/g, "").replace(/(\d)-(\d+\/\d+)/g, "$1 $2");
+  if (!text) return NaN;
+  let total = 0;
+  for (const part of text.split(/\s+/)) {
+    if (/^\d+\/\d+$/.test(part)) {
+      const [a, b] = part.split("/").map(Number);
+      if (b === 0) return NaN;
+      total += a / b;
+    } else if (/^\d+(\.\d+)?$/.test(part)) {
+      total += Number(part);
+    } else {
+      return NaN;
+    }
+  }
+  return total;
+}
+
+function checkPanelAnswer() {
+  const opening = parseInches(document.getElementById("opening").value);
+  const answer = parseInches(document.getElementById("student-answer").value);
+  const result = document.getElementById("panel-result");
+
+  if (!Number.isFinite(opening) || opening <= 0 || !Number.isFinite(answer) || answer <= 0) {
+    result.style.color = "#b45309";
+    result.textContent = "Please enter valid measurements, such as 10 3/4.";
+    return;
+  }
+
+  const correct = opening + 1 - 1/8;
+  if (Math.abs(answer - correct) < 0.00001) {
+    result.style.color = "#15803d";
+    result.textContent = "✅ Correct! Great job!";
+  } else {
+    result.style.color = "#dc2626";
+    result.textContent = "❌ Not quite! Check your calculation and try again.";
+  }
+}
+
+document.getElementById("check").addEventListener("click", checkPanelAnswer);
+</script>
+</body>
+</html>

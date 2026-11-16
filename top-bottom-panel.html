@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Top & Bottom Panel Width Calculator</title>
+<style>
+  :root { color-scheme: light; --ink:#1d2b3a; --muted:#5b6b7b; --blue:#215bb6; --pale:#edf4ff; --edge:#d8e2ed; --wood:#f7e9cb; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:28px 16px; font: 16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#f4f7fa; color:var(--ink); }
+  main { max-width:740px; margin:auto; background:white; border:1px solid var(--edge); border-radius:20px; padding:clamp(20px,5vw,38px); box-shadow:0 10px 38px #2030400b; }
+  h1 { margin:0; font-size:clamp(1.6rem,4vw,2.2rem); line-height:1.2; }
+  .intro { color:var(--muted); margin:12px 0 26px; }
+  label { font-weight:750; display:block; margin-bottom:8px; }
+  input { width:100%; padding:16px; border:2px solid #a9bdd6; border-radius:12px; font:inherit; font-size:1.4rem; font-weight:650; color:var(--ink); }
+  input:focus { outline:3px solid #c9ddff; border-color:var(--blue); }
+  .hint { margin:7px 0 0; font-size:.88rem; color:var(--muted); }
+  .error { color:#a32424; font-size:.9rem; min-height:1.4em; margin-top:6px; }
+  .result { background:var(--pale); border:1px solid #c6daf8; border-radius:16px; padding:24px; text-align:center; margin-top:18px; }
+  .result .heading { color:#294a7b; font-weight:700; }
+  output { display:block; font-size:clamp(2.6rem,8vw,4.2rem); line-height:1.2; font-weight:850; color:#164b99; margin:10px 0 6px; }
+  .small { color:var(--muted); font-size:.95rem; }
+  h2 { font-size:1.15rem; margin:30px 0 12px; }
+  .equation { padding:15px; background:#f7f9fb; border:1px solid var(--edge); border-radius:10px; text-align:center; font-weight:700; }
+  .parts { width:100%; border-collapse:collapse; margin:10px 0 0; }
+  .parts td { padding:10px 4px; border-bottom:1px solid #e7ebf0; }
+  .parts td:last-child { text-align:right; font-weight:650; white-space:nowrap; }
+  .parts tr:last-child td { font-weight:800; border-top:2px solid var(--ink); border-bottom:0; }
+  .drawing { margin-top:22px; }
+  .drawing-caption { color:var(--muted); font-size:.84rem; text-align:center; margin:7px 0 0; }
+  .panel { display:flex; height:75px; border:2px solid #bd9f66; border-radius:4px; overflow:hidden; background:var(--wood); }
+  .section { display:flex; justify-content:center; align-items:center; text-align:center; min-width:0; font-weight:700; font-size:.85rem; }
+  .side { flex:0 0 12%; background:#ead4a8; }
+  .hinge { flex:0 0 10%; background:#efd1c7; border-inline:2px solid #c97d60; }
+  .door { flex:1; padding:5px; font-size:clamp(.72rem,2.5vw,1rem); }
+  .actions { display:flex; gap:10px; margin-top:24px; flex-wrap:wrap; }
+  button { cursor:pointer; padding:11px 19px; background:var(--blue); color:white; font:inherit; font-weight:700; border:0; border-radius:9px; }
+  button.secondary { background:#ebf0f6; color:var(--ink); }
+  .note { font-size:.85rem; color:var(--muted); margin-top:14px; }
+  @media print {body{background:white;padding:0} main{border:0;box-shadow:none} .actions{display:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Top & Bottom Panel Width Calculator</h1>
+  <p class="intro">Enter <strong>your door width</strong>. The calculator will automatically find the cutting width for <strong>both</strong> the top and bottom panels.</p>
+  <label for="doorWidth">My door width (inches)</label>
+  <input id="doorWidth" type="text" value="10 3/4" placeholder="Example: 10 3/4" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="hint error">
+  <p class="hint" id="hint">You can type <strong>10 3/4</strong>, <strong>10-3/4</strong>, <strong>10.75</strong>, or <strong>3/4</strong>.</p>
+  <div class="error" id="error" role="status" aria-live="polite"></div>
+  <div class="result" aria-live="polite">
+    <div class="heading">Cut BOTH panels to this width:</div>
+    <output id="result" for="doorWidth">12 3/16″</output>
+    <div class="small">Top panel = Bottom panel</div>
+  </div>
+  <h2>How the width is calculated</h2>
+  <div class="equation">Door width + 5/8″ + 1/8″ + 5/8″ + 1/16″ = Panel width</div>
+  <table class="parts" aria-label="Calculation breakdown">
+    <tbody>
+      <tr><td>Your door width, plus allowance</td><td id="doorWithAllowance">10 13/16″</td></tr>
+      <tr><td>Left side thickness</td><td>5/8″</td></tr>
+      <tr><td>Hinge stile</td><td>1/8″</td></tr>
+      <tr><td>Right side thickness</td><td>5/8″</td></tr>
+      <tr><td><strong>Total top / bottom width</strong></td><td id="total">12 3/16″</td></tr>
+    </tbody>
+  </table>
+  <div class="drawing" aria-label="Diagram of panel components">
+    <div class="panel">
+      <div class="section side">5/8″</div>
+      <div class="section hinge">1/8″</div>
+      <div class="section door">Door width + 1/16″</div>
+      <div class="section side">5/8″</div>
+    </div>
+    <p class="drawing-caption">Diagram is not to scale.</p>
+  </div>
+  <div class="actions">
+    <button id="copy" type="button">Copy my measurements</button>
+    <button class="secondary" type="button" onclick="window.print()">Print</button>
+  </div>
+  <p class="note">Calculated to the nearest 1/16″. The fixed dimensions are based on your class drawing.</p>
+</main>
+<script>
+const input = document.getElementById('doorWidth');
+const result = document.getElementById('result');
+const total = document.getElementById('total');
+const allowance = document.getElementById('doorWithAllowance');
+const error = document.getElementById('error');
+const copyButton = document.getElementById('copy');
+function parseWidth(raw) {
+  const text = raw.trim().replace(/[″“”"]/g,'').replace(/(\d)-(\d+\/\d+)/g,'$1 $2');
+  if (!text) return NaN;
+  const pieces = text.split(/\s+/);
+  if (pieces.length > 2) return NaN;
+  let sum=0;
+  for (const p of pieces) {
+    if (/^\d+\/\d+$/.test(p)) {
+      const [n,d]=p.split('/').map(Number);
+      if (!d) return NaN;
+      sum+=n/d;
+    } else if (/^\d+(?:\.\d+)?$/.test(p)) sum+=Number(p);
+    else return NaN;
+  }
+  return sum;
+}
+function gcd(a,b) { return b ? gcd(b,a%b) : a; }
+function inches(value) {
+  const rounded=Math.round(value*16);
+  const whole=Math.floor(rounded/16);
+  const rem=rounded%16;
+  if (!rem) return `${whole}″`;
+  const divisor=gcd(rem,16);
+  const frac=`${rem/divisor}/${16/divisor}`;
+  return `${whole ? whole+' ' : ''}${frac}″`;
+}
+function update() {
+  const door=parseWidth(input.value);
+  if (!Number.isFinite(door) || door<=0) {
+    error.textContent='Please enter a valid door width greater than zero.';
+    result.textContent='—'; total.textContent='—'; allowance.textContent='—';
+    copyButton.disabled=true; return;
+  }
+  error.textContent=''; copyButton.disabled=false;
+  const panel=door+5/8+1/8+5/8+1/16;
+  result.textContent=inches(panel);
+  total.textContent=inches(panel);
+  allowance.textContent=inches(door+1/16);
+}
+input.addEventListener('input',update);
+copyButton.addEventListener('click',async()=>{
+  const text=`Door width: ${inches(parseWidth(input.value))}\nTop panel width: ${result.textContent}\nBottom panel width: ${result.textContent}`;
+  try { await navigator.clipboard.writeText(text); copyButton.textContent='Copied!'; setTimeout(()=>copyButton.textContent='Copy my measurements',1800); }
+  catch { window.prompt('Copy your measurements:',text); }
+});
+update();
+</script>
+</body>
+</html>
