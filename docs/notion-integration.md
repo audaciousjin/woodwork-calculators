@@ -7,8 +7,8 @@ Where each calculator appears in Notion, and its live URL.
 
 | Calculator | Notion section | Live URL | Embedded? |
 | --- | --- | --- | --- |
-| Door panel checker | 1. What's my door panel size? | https://audaciousjin.github.io/woodwork-calculators/door-panel.html | Yes (URL embed + fallback link), added 2026-11-15 |
-| Top & bottom panel width | 3. What are the widths of my top and bottom panels? | https://audaciousjin.github.io/woodwork-calculators/top-bottom-panel.html | Yes (URL embed + fallback link), added 2026-11-15 |
+| Door panel checker | 1. What's my door panel size? | https://audaciousjin.github.io/woodwork-calculators/door-panel.html?v=2 | Yes (URL embed + fallback link), added 2026-11-15 |
+| Top & bottom panel width | 3. What are the widths of my top and bottom panels? | https://audaciousjin.github.io/woodwork-calculators/top-bottom-panel.html?v=2 | Yes (URL embed + fallback link), added 2026-11-15 |
 
 Landing page: https://audaciousjin.github.io/woodwork-calculators/
 Repository: https://github.com/audaciousjin/woodwork-calculators
@@ -20,6 +20,13 @@ Repository: https://github.com/audaciousjin/woodwork-calculators
   (hover → ⋮⋮ → Delete).
 - The **Door Panel Checker** and **Top & Bottom Panel Calculator** Notion databases
   (earlier formula/form attempt), directly below each new embed.
+
+## Forcing a fresh version after an update
+
+GitHub Pages sends `cache-control: max-age=600`, so phones and Notion can show
+the previous version for ~10 minutes after a push. The Notion embeds and
+fallback links use a version tag (currently `?v=2`). After a change students
+must see right away, bump it (`?v=3`, …) in both the embed and the link.
 
 ## How to embed (manual)
 
