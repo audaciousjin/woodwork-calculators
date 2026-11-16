@@ -39,6 +39,19 @@ in any mobile browser, inside the Notion page, with no download and no login.
   pointing at the live URL, plus a plain text link underneath as a fallback for
   devices or networks that block iframes.
 
+## Input design (revised 2026-11-15 after phone test)
+
+The first version used free-text boxes (`10 3/4`). On the teacher's phone the
+`/` key could not be found: the top/bottom page used `inputmode="decimal"`
+(number pad, no `/` or space) and on standard phone keyboards `/` sits on a
+secondary symbols page. Every size is now:
+
+- a **whole-inch number box** (`type="number"`, `inputmode="numeric"`), and
+- a **fraction drop-down** `+ 0`, `+ 1/16` … `+ 15/16`.
+
+Values are compared in sixteenths (integers), so the checker has no
+floating-point rounding issues.
+
 ## Calculators
 
 ### Door panel checker (`door-panel.html`)

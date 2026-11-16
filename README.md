@@ -12,7 +12,9 @@ can use them on any phone, tablet, or computer without downloading anything.
 | [`top-bottom-panel.html`](top-bottom-panel.html) | Calculates the cutting width for both the top and bottom cabinet panels | Panel = Door width + 1/16″ + 5/8″ + 1/8″ + 5/8″ |
 | [`index.html`](index.html) | Landing page linking to both calculators | — |
 
-Accepted input formats: `10 3/4`, `10-3/4`, `10.75`, `10 3/4"`.
+**Entering sizes:** each size is a whole-inch number box plus a fraction drop-down
+(`+ 0` … `+ 15/16`, in 1/16″ steps). Students never type `/`: phone number pads
+don't have it, and on many phone keyboards it is hidden on a second page.
 
 ## Live site
 
@@ -47,5 +49,6 @@ woodwork-calculators/
 ## Rules for every page
 
 - Must include `<meta name="viewport" content="width=device-width, initial-scale=1">`.
+- Never require typing fractions: use a whole-inch box + 1/16″ fraction picker.
 - No external scripts, fonts, or trackers: pages must work on locked-down school networks.
 - No student data is stored or sent anywhere; everything runs in the browser.

@@ -13,8 +13,14 @@
   h1 { font-size: 1.5rem; margin: 0 0 8px; }
   .fixed { background: #f3f4f6; padding: 15px; border-radius: 8px; }
   .fixed p { margin: 4px 0; }
-  label { display: block; font-weight: 700; margin: 18px 0 6px; }
-  input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #a9bdd6; border-radius: 8px; }
+  .label { display: block; font-weight: 700; margin: 18px 0 6px; }
+  .size { display: flex; align-items: center; gap: 8px; }
+  .size input, .size select { padding: 12px; font-size: 18px; border: 2px solid #a9bdd6;
+                              border-radius: 8px; background: #fff; color: inherit; }
+  .size input { width: 5.5em; }
+  .size select { flex: 1; min-width: 0; }
+  .unit { font-weight: 700; }
+  .hint { font-size: .85rem; color: #5b6b7b; margin: 4px 0 0; }
   button { margin-top: 20px; padding: 14px; width: 100%; background: #2563eb; color: #fff;
            border: 0; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
   #panel-result { margin-top: 16px; font-weight: bold; min-height: 1.5em; }
@@ -32,11 +38,20 @@
     <p><strong>Formula:</strong><br>Panel Size = Opening + 1" − 1/8"</p>
   </div>
 
-  <label for="opening">1. Opening size (inches)</label>
-  <input id="opening" type="text" placeholder="e.g. 10 3/4" autocomplete="off" spellcheck="false">
+  <span class="label" id="opening-label">1. Opening size</span>
+  <div class="size" role="group" aria-labelledby="opening-label">
+    <input id="opening-whole" type="number" inputmode="numeric" min="0" step="1" placeholder="10" aria-label="Opening, whole inches">
+    <select id="opening-frac" class="frac" aria-label="Opening, fraction of an inch"></select>
+    <span class="unit">″</span>
+  </div>
 
-  <label for="student-answer">2. Your calculated panel size (inches)</label>
-  <input id="student-answer" type="text" placeholder="e.g. 11 5/8" autocomplete="off" spellcheck="false">
+  <span class="label" id="answer-label">2. Your calculated panel size</span>
+  <div class="size" role="group" aria-labelledby="answer-label">
+    <input id="answer-whole" type="number" inputmode="numeric" min="0" step="1" placeholder="11" aria-label="Your answer, whole inches">
+    <select id="answer-frac" class="frac" aria-label="Your answer, fraction of an inch"></select>
+    <span class="unit">″</span>
+  </div>
+  <p class="hint">Type the whole inches, then pick the fraction. Example: 10 and 3/4.</p>
 
   <button type="button" id="check">Check My Answer</button>
 
@@ -44,37 +59,38 @@
 </main>
 
 <script>
-function parseInches(value) {
-  const text = value.trim().replace(/["″“”]/g, "").replace(/(\d)-(\d+\/\d+)/g, "$1 $2");
-  if (!text) return NaN;
-  let total = 0;
-  for (const part of text.split(/\s+/)) {
-    if (/^\d+\/\d+$/.test(part)) {
-      const [a, b] = part.split("/").map(Number);
-      if (b === 0) return NaN;
-      total += a / b;
-    } else if (/^\d+(\.\d+)?$/.test(part)) {
-      total += Number(part);
-    } else {
-      return NaN;
-    }
-  }
-  return total;
+const FRACTIONS = ["0", "1/16", "1/8", "3/16", "1/4", "5/16", "3/8", "7/16", "1/2",
+                   "9/16", "5/8", "11/16", "3/4", "13/16", "7/8", "15/16"];
+
+for (const select of document.querySelectorAll(".frac")) {
+  FRACTIONS.forEach((label, i) => {
+    const option = document.createElement("option");
+    option.value = i;               // sixteenths
+    option.textContent = i === 0 ? "+ 0" : "+ " + label;
+    select.appendChild(option);
+  });
+}
+
+// Returns the size in sixteenths of an inch, or NaN if the whole-inch box is empty/invalid.
+function readSixteenths(prefix) {
+  const raw = document.getElementById(prefix + "-whole").value.trim();
+  if (!/^\d+$/.test(raw)) return NaN;
+  return Number(raw) * 16 + Number(document.getElementById(prefix + "-frac").value);
 }
 
 function checkPanelAnswer() {
-  const opening = parseInches(document.getElementById("opening").value);
-  const answer = parseInches(document.getElementById("student-answer").value);
+  const opening = readSixteenths("opening");
+  const answer = readSixteenths("answer");
   const result = document.getElementById("panel-result");
 
   if (!Number.isFinite(opening) || opening <= 0 || !Number.isFinite(answer) || answer <= 0) {
     result.style.color = "#b45309";
-    result.textContent = "Please enter valid measurements, such as 10 3/4.";
+    result.textContent = "Please type the whole inches for both sizes, then pick the fractions.";
     return;
   }
 
-  const correct = opening + 1 - 1/8;
-  if (Math.abs(answer - correct) < 0.00001) {
+  const correct = opening + 16 - 2;   // + 1" − 1/8", in sixteenths
+  if (answer === correct) {
     result.style.color = "#15803d";
     result.textContent = "✅ Correct! Great job!";
   } else {

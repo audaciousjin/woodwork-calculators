@@ -12,8 +12,12 @@
   h1 { margin:0; font-size:clamp(1.6rem,4vw,2.2rem); line-height:1.2; }
   .intro { color:var(--muted); margin:12px 0 26px; }
   label { font-weight:750; display:block; margin-bottom:8px; }
-  input { width:100%; padding:16px; border:2px solid #a9bdd6; border-radius:12px; font:inherit; font-size:1.4rem; font-weight:650; color:var(--ink); }
-  input:focus { outline:3px solid #c9ddff; border-color:var(--blue); }
+  .size { display:flex; align-items:center; gap:10px; }
+  input, select { padding:14px; border:2px solid #a9bdd6; border-radius:12px; font:inherit; font-size:1.4rem; font-weight:650; color:var(--ink); background:white; }
+  input { width:5em; }
+  select { flex:1; min-width:0; }
+  .unit { font-size:1.4rem; font-weight:700; }
+  input:focus, select:focus { outline:3px solid #c9ddff; border-color:var(--blue); }
   .hint { margin:7px 0 0; font-size:.88rem; color:var(--muted); }
   .error { color:#a32424; font-size:.9rem; min-height:1.4em; margin-top:6px; }
   .result { background:var(--pale); border:1px solid #c6daf8; border-radius:16px; padding:24px; text-align:center; margin-top:18px; }
@@ -44,9 +48,13 @@
 <main>
   <h1>Top & Bottom Panel Width Calculator</h1>
   <p class="intro">Enter <strong>your door width</strong>. The calculator will automatically find the cutting width for <strong>both</strong> the top and bottom panels.</p>
-  <label for="doorWidth">My door width (inches)</label>
-  <input id="doorWidth" type="text" value="10 3/4" placeholder="Example: 10 3/4" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="hint error">
-  <p class="hint" id="hint">You can type <strong>10 3/4</strong>, <strong>10-3/4</strong>, <strong>10.75</strong>, or <strong>3/4</strong>.</p>
+  <label id="doorWidthLabel" for="doorWidth">My door width</label>
+  <div class="size" role="group" aria-labelledby="doorWidthLabel">
+    <input id="doorWidth" type="number" inputmode="numeric" min="0" step="1" value="10" placeholder="10" aria-label="Door width, whole inches" aria-describedby="hint error">
+    <select id="doorFrac" aria-label="Door width, fraction of an inch"></select>
+    <span class="unit">″</span>
+  </div>
+  <p class="hint" id="hint">Type the whole inches, then pick the fraction. Example: <strong>10</strong> and <strong>+ 3/4</strong>.</p>
   <div class="error" id="error" role="status" aria-live="polite"></div>
   <div class="result" aria-live="polite">
     <div class="heading">Cut BOTH panels to this width:</div>
@@ -86,21 +94,15 @@ const total = document.getElementById('total');
 const allowance = document.getElementById('doorWithAllowance');
 const error = document.getElementById('error');
 const copyButton = document.getElementById('copy');
-function parseWidth(raw) {
-  const text = raw.trim().replace(/[″“”"]/g,'').replace(/(\d)-(\d+\/\d+)/g,'$1 $2');
-  if (!text) return NaN;
-  const pieces = text.split(/\s+/);
-  if (pieces.length > 2) return NaN;
-  let sum=0;
-  for (const p of pieces) {
-    if (/^\d+\/\d+$/.test(p)) {
-      const [n,d]=p.split('/').map(Number);
-      if (!d) return NaN;
-      sum+=n/d;
-    } else if (/^\d+(?:\.\d+)?$/.test(p)) sum+=Number(p);
-    else return NaN;
-  }
-  return sum;
+const frac = document.getElementById('doorFrac');
+['0','1/16','1/8','3/16','1/4','5/16','3/8','7/16','1/2','9/16','5/8','11/16','3/4','13/16','7/8','15/16']
+  .forEach((label, i) => { const o = document.createElement('option'); o.value = i; o.textContent = '+ ' + label; frac.appendChild(o); });
+frac.value = 12; // default example: 10 3/4
+// Door width in inches from the whole-inch box and the sixteenths picker, or NaN.
+function readWidth() {
+  const raw = input.value.trim();
+  if (!/^\d+$/.test(raw)) return NaN;
+  return Number(raw) + Number(frac.value) / 16;
 }
 function gcd(a,b) { return b ? gcd(b,a%b) : a; }
 function inches(value) {
@@ -113,9 +115,9 @@ function inches(value) {
   return `${whole ? whole+' ' : ''}${frac}″`;
 }
 function update() {
-  const door=parseWidth(input.value);
+  const door=readWidth();
   if (!Number.isFinite(door) || door<=0) {
-    error.textContent='Please enter a valid door width greater than zero.';
+    error.textContent='Please type the whole inches of your door width.';
     result.textContent='—'; total.textContent='—'; allowance.textContent='—';
     copyButton.disabled=true; return;
   }
@@ -126,8 +128,9 @@ function update() {
   allowance.textContent=inches(door+1/16);
 }
 input.addEventListener('input',update);
+frac.addEventListener('change',update);
 copyButton.addEventListener('click',async()=>{
-  const text=`Door width: ${inches(parseWidth(input.value))}\nTop panel width: ${result.textContent}\nBottom panel width: ${result.textContent}`;
+  const text=`Door width: ${inches(readWidth())}\nTop panel width: ${result.textContent}\nBottom panel width: ${result.textContent}`;
   try { await navigator.clipboard.writeText(text); copyButton.textContent='Copied!'; setTimeout(()=>copyButton.textContent='Copy my measurements',1800); }
   catch { window.prompt('Copy your measurements:',text); }
 });

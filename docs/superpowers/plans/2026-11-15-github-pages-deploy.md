@@ -23,5 +23,7 @@
       top/bottom: `10 3/4`, `10-3/4"`, `10.75` → 12 3/16″, `abc` → error. (Desktop Chrome, 375 px frame; not yet on a real phone.)
 - [x] **7. Notion** — URL embeds + fallback links added in sections 1 and 3.
       Old uploaded-file embeds could not be removed via API; see [../../notion-integration.md](../../notion-integration.md).
-- [ ] **7b. Teacher check** — open the lesson's public link on a phone and confirm both embeds work.
+- [x] **7b. Teacher check** — embeds display on the phone. Issue found: no `/` key on the phone keyboard.
+- [x] **7c. Fix input** — replaced typed fractions with whole-inch box + 1/16″ fraction picker (see spec, "Input design").
+- [ ] **7d. Teacher re-check** on the phone after the input fix.
 - [ ] **8. Clean up** — after teacher confirms on a phone, remove the old Notion databases/forms.
