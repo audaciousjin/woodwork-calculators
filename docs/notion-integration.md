@@ -7,8 +7,19 @@ Where each calculator appears in Notion, and its live URL.
 
 | Calculator | Notion section | Live URL | Embedded? |
 | --- | --- | --- | --- |
-| Door panel checker | 1. What's my door panel size? | _pending_ | No — still the uploaded file |
-| Top & bottom panel width | 3. What are the widths of my top and bottom panels? | _pending_ | No — still the uploaded file |
+| Door panel checker | 1. What's my door panel size? | https://audaciousjin.github.io/woodwork-calculators/door-panel.html | Yes (URL embed + fallback link), added 2026-11-15 |
+| Top & bottom panel width | 3. What are the widths of my top and bottom panels? | https://audaciousjin.github.io/woodwork-calculators/top-bottom-panel.html | Yes (URL embed + fallback link), added 2026-11-15 |
+
+Landing page: https://audaciousjin.github.io/woodwork-calculators/
+Repository: https://github.com/audaciousjin/woodwork-calculators
+
+## Still on the Notion page (to remove after phone check)
+
+- The two old **uploaded-file** embeds (`preview (1).html`, `top_bottom_panel_calculator.html`),
+  directly above each new embed. The Notion API cannot select these blocks — delete by hand
+  (hover → ⋮⋮ → Delete).
+- The **Door Panel Checker** and **Top & Bottom Panel Calculator** Notion databases
+  (earlier formula/form attempt), directly below each new embed.
 
 ## How to embed (manual)
 
